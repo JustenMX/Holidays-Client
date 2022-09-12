@@ -1,6 +1,13 @@
-fetch("http://localhost:3100/")
+import debug from "debug";
+
+const log = debug("holidays:client:App");
+const SERVER = import.meta.env.VITE_SERVER;
+
+localStorage.debug = "holidays:*";
+
+fetch(SERVER)
   .then((response) => response.json())
-  .then((data) => console.log(data));
+  .then((data) => log(data));
 
 function App() {
   return (
