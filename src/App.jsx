@@ -1,19 +1,30 @@
 import debug from "debug";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import CreateHolidayForm from "./components/CreateHolidayForm";
+import Login from "./components/Login";
 
 const log = debug("holidays:client:App");
-const SERVER = import.meta.env.VITE_SERVER;
-
 localStorage.debug = "holidays:*";
 
-fetch(SERVER)
-  .then((response) => response.json())
-  .then((data) => log(data));
-
 function App() {
+  log("Loading App");
   return (
-    <div>
-      <h1>Holidays</h1>
-    </div>
+    <BrowserRouter>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/">Login</Link>
+          </li>
+          <li>
+            <Link to="/secret">Secret</Link>
+          </li>
+        </ul>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/secret" element={<CreateHolidayForm />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
