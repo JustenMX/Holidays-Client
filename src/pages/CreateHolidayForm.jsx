@@ -1,27 +1,50 @@
 import debug from "debug";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import urlcat from "urlcat";
+import CountriesSelect from "../components/CountriesSelect";
+import { SERVER } from "../utils/constants";
 
 const log = debug("holidays:client:components:CreateHolidayForm");
-const SERVER = import.meta.env.VITE_SERVER;
 
-const fetchCountries = async () => {
-  const request = fetch;
+const parseJwt = (token) => {
+  if (token === "") {
+    return {};
+  }
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  var jsonPayload = decodeURIComponent(
+    window
+      .atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+
+  return JSON.parse(jsonPayload);
 };
 
-function CreateHolidayForm() {
-  const [countries, setCountries] = useState([]);
+function CreateHolidayForm({ token }) {
   const [status, setStatus] = useState("");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchCountries = async () => {
-      const url = urlcat(SERVER, "/countries");
-      const request = await fetch(url);
-      const data = await request.json();
-      setCountries(data);
-    };
-    fetchCountries();
-  }, []);
+  if (parseJwt(token).name !== "simon") {
+    navigate("/login");
+  }
+
+  // useEffect(() => {
+  //   const url = urlcat(SERVER, "/verify");
+  //   fetch(url, {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => log(data));
+  // }, []);
 
   const handleCreate = (event) => {
     event.preventDefault();
@@ -73,13 +96,7 @@ function CreateHolidayForm() {
         <br />
         <label>
           Countries:
-          <select name="countries">
-            {countries.map((country) => (
-              <option key={country._id} value={country._id}>
-                {country.title}
-              </option>
-            ))}
-          </select>
+          <CountriesSelect name="countries" />
         </label>
       </fieldset>
       <button>Create</button>

@@ -1,11 +1,11 @@
 import debug from "debug";
 import urlcat from "urlcat";
+import { SERVER } from "../utils/constants";
 
 const log = debug("holidays:client:components:Login");
-const SERVER = import.meta.env.VITE_SERVER;
 const url = urlcat(SERVER, "/login");
 
-function Login() {
+function Login({ setToken }) {
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -24,6 +24,7 @@ function Login() {
     });
     const data = await res.json();
     log("response %o", data);
+    setToken(data.token);
   };
 
   return (
